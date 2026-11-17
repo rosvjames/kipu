@@ -1,0 +1,33 @@
+id: ingest
+namespace: shop
+description: Downloads the daily orders file and loads it into RAW.
+
+tasks:
+  - id: download
+    type: io.kestra.plugin.scripts.shell.Commands
+    commands:
+      - curl -sSL https://data.example.com/orders.csv -o orders.csv
+    outputFiles:
+      - orders.csv
+
+  - id: upload
+    type: io.kestra.plugin.jdbc.snowflake.Upload
+    from: "{{ outputs.download.outputFiles['orders.csv'] }}"
+    stageName: "@SHOP.RAW.LANDING"
+
+  - id: load_orders
+    type: io.kestra.plugin.jdbc.snowflake.Queries
+    sql: |
+      CREATE TABLE IF NOT EXISTS SHOP.RAW.ORDERS (id INT, amount NUMBER, day DATE);
+
+      COPY INTO SHOP.RAW.ORDERS
+      FROM @SHOP.RAW.LANDING/orders_{{ execution.id }}.csv;
+
+      INSERT INTO SHOP.RAW.LOAD_LOG (n)
+      WITH c AS (SELECT COUNT(*) AS n FROM SHOP.RAW.ORDERS)
+      SELECT n FROM c;
+
+triggers:
+  - id: daily
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 5 * * *"

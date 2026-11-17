@@ -1,0 +1,27 @@
+[project]
+name = "kipu"
+version = "0.0.1"
+description = "See what your AI built: a live, faithful map of your project's architecture and data flow."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+    "pyyaml>=6.0",
+    "sqlglot>=25.0",
+]
+
+[project.scripts]
+kipu = "kipu.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/kipu"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

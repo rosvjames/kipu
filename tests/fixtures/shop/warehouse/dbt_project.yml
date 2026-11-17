@@ -1,0 +1,10 @@
+name: shop
+profile: shop
+model-paths: ["models"]
+models:
+  shop:
+    staging:
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table

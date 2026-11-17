@@ -1,0 +1,20 @@
+id: transform
+namespace: shop
+tasks:
+  - id: dbt_build
+    type: io.kestra.plugin.dbt.cli.DbtCLI
+    commands:
+      - dbt build
+  - id: export
+    type: io.kestra.plugin.scripts.shell.Commands
+    commands:
+      - python /app/jobs/export.py
+triggers:
+  - id: after_ingest
+    type: io.kestra.plugin.core.trigger.Flow
+    preconditions:
+      id: ok
+      flows:
+        - namespace: shop
+          flowId: ingest
+          states: [SUCCESS]

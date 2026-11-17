@@ -1,0 +1,8 @@
+shop:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      database: SHOP
+      schema: STAGING
+      password: "{{ env_var('SHOULD_NEVER_BE_READ') }}"
